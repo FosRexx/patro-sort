@@ -28,7 +28,7 @@ def validate_args(args: Args, parser: argparse.ArgumentParser) -> None:
 def parse_args() -> Args:
     parser = argparse.ArgumentParser(
         prog="bs-media-sorter",
-        description="Sort images/videos into Bikram Samvat (BS) folder structures.",
+        description="Sort images/videos/audio into Bikram Sambat folder structures.",
     )
 
     parser.add_argument("src_dir", type=Path, help="Source directory containing media")
