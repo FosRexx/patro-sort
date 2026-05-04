@@ -101,10 +101,12 @@ def main() -> None:
 
     index = FileIndex(BikramSambatDateTime)
     logger.info("Extracting metadata...")
-    logger.info("")
 
     for entry in build_entries(files, args.fs_ctime_fb):
         index.add(entry)
+        logger.debug("")
+
+    logger.info("")
 
     _print_summary(index)
 
