@@ -1,11 +1,19 @@
+"""
+calendar_datetime.py - Abstract and concrete CalendarDateTime implementations.
+
+CalendarDateTime wraps a UTC datetime and exposes it as year/month/day/time
+components in a specific calendar system and timezone. Subclasses handle the
+conversion; the rest of the codebase is calendar-agnostic.
+
+Provided implementations:
+    BikramSambatDateTime - Nepali Bikram Sambat calendar, Nepal Standard Time
+                           (UTC+05:45).
+"""
+
 import datetime
 from abc import ABC, abstractmethod
 
 import nepali_datetime
-
-# ---------------------------------------------------------------------------
-# Abstract Base Class
-# ---------------------------------------------------------------------------
 
 
 class CalendarDateTime(ABC):
@@ -18,13 +26,14 @@ class CalendarDateTime(ABC):
     """
 
     def __init__(self, utc: datetime.datetime) -> None:
-        # Guarantee the stored value is always UTC-aware.
+        # Ensure the stored value is always UTC-aware.
         if utc.tzinfo is None:
             utc = utc.replace(tzinfo=datetime.timezone.utc)
         self._utc = utc
 
     @property
     def utc(self) -> datetime.datetime:
+        """The original UTC datetime this instance was constructed from."""
         return self._utc
 
     @property
@@ -55,16 +64,21 @@ class CalendarDateTime(ABC):
     @abstractmethod
     def utc_offset_str(self) -> str:
         """
-        UTC offset formatted for inclusion in filenames, e.g. '+0545', '+0000'.
-        Colons are intentionally omitted since they are illegal on Windows.
+        UTC offset formatted for use in filenames, e.g. '+0545' or '+0000'.
+
+        Colons are intentionally omitted because they are illegal in filenames
+        on Windows.
         """
         ...
 
     def isoformat_filename_safe(self) -> str:
         """
-        ISO-8601-ish timestamp safe to use as a filename component.
+        Return an ISO-8601-ish timestamp safe to use as a filename component.
 
         Format: YYYY-MM-DDTHH-MM-SS<utc_offset_str>
+
+        Colons within the time portion are replaced with hyphens for
+        cross-platform filesystem compatibility.
         """
         return (
             f"{self.year:04d}-{self.month:02d}-{self.day:02d}"
@@ -74,13 +88,22 @@ class CalendarDateTime(ABC):
 
 
 class BikramSambatDateTime(CalendarDateTime):
+    """
+    CalendarDateTime expressed in the Bikram Sambat calendar, Nepal Standard
+    Time (NST, UTC+05:45).
+
+    Date components (year, month, day) are in the BS calendar. Time components
+    (hour, minute, second) reflect NST. The UTC offset string is always
+    '+0545'.
+    """
+
     def __init__(self, utc: datetime.datetime) -> None:
         super().__init__(utc)
         self._nst = self._utc.astimezone(
             datetime.timezone(datetime.timedelta(hours=5, minutes=45))
         )
         nsd: nepali_datetime.date = nepali_datetime.date.from_datetime_date(
-            self._utc.date()
+            self._nst.date()
         )
 
         self._bs_year = nsd.year
