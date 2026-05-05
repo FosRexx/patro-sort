@@ -5,12 +5,17 @@ FileIndex accepts a calendar_factory callable that converts a UTC datetime
 into a CalendarDateTime subclass. All year/month bucketing is performed in
 whatever calendar system the factory produces, so the same index can power
 both Gregorian and Bikram Sambat sorting without code changes.
+
+FileIndex also holds src_dir, the root of the scanned source tree. This lets
+downstream consumers (e.g. sort_files) reconstruct the relative path of any
+entry without needing src_dir passed separately.
 """
 
 import logging
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from calendar_datetime import CalendarDateTime
 from file import FileEntry, FileType
@@ -54,6 +59,7 @@ class FileIndex:
     """
 
     calendar_factory: CalendarFactory
+    src_dir: Path
 
     _entries: list[FileEntry] = field(default_factory=list, init=False)
     # (year, month) in the chosen calendar → sortable entries
@@ -122,6 +128,17 @@ class FileIndex:
     @property
     def unsortable(self) -> list[FileEntry]:
         return self._unsortable
+
+    def relative_path(self, entry: FileEntry) -> Path:
+        """
+        Return entry.path relative to src_dir.
+
+        For example, if src_dir is /media and entry.path is
+        /media/foo/bar.jpg, this returns foo/bar.jpg.
+
+        Raises ValueError if entry.path is not inside src_dir.
+        """
+        return entry.path.relative_to(self.src_dir)
 
     def years(self) -> list[int]:
         """Sorted list of distinct years (in the target calendar) present in the index."""

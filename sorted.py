@@ -9,7 +9,10 @@ instance, so folder names and filenames are always expressed in the same
 calendar system.
 
 Unsortable files (unknown type or missing date) are placed under:
-    <dest_dir>/unsorted/<original_filename>
+    <dest_dir>/unsorted/<relative_path_from_src_dir>
+
+Preserving the relative path means the original folder structure is retained
+under the unsorted directory, making it easy to locate files manually.
 """
 
 from __future__ import annotations
@@ -233,18 +236,21 @@ def sort_files(index: FileIndex, dest_dir: Path, dry_run: bool = True) -> SortRe
 
             _log_batch_summary(period_label, annotated, dry_run)
 
-    # Place unsortable files under <dest_dir>/unsorted/.
+    # Place unsortable files under <dest_dir>/unsorted/, preserving their
+    # relative path within the source tree. For example, a file originally at
+    # <src_dir>/foo/bar.jpg lands at <dest_dir>/unsorted/foo/bar.jpg.
     if index.unsortable:
-        unsorted_dir = dest_dir / UNSORTED_DIR_NAME
-        if not dry_run:
-            unsorted_dir.mkdir(parents=True, exist_ok=True)
-            logger.debug("Created directory: %s", unsorted_dir)
+        unsorted_base = dest_dir / UNSORTED_DIR_NAME
 
         unsorted_pairs: list[tuple[Path, Path]] = []
         unsorted_log: list[tuple[Path, Path, str]] = []
 
         for entry in index.unsortable:
-            dest_path = _unique_dest(unsorted_dir, entry.path.name)
+            rel = index.relative_path(entry)
+            dest_path = _unique_dest(unsorted_base / rel.parent, rel.name)
+            if not dry_run:
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                logger.debug("Created directory: %s", dest_path.parent)
             unsorted_pairs.append((entry.path, dest_path))
             unsorted_log.append((entry.path, dest_path, "unsorted"))
 
