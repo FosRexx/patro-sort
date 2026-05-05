@@ -17,8 +17,8 @@ require Time::Local;
         10 => 'PNG:CreationTime',              # PNG
         11 => 'ID3:RecordingTime',             # MP3
         12 => 'ID3:Year',                      # MP3 fallback (year only)
-        13 => 'FileModifyDate',                # Filesystem modify date
-        14 => 'FileCreateDate',                # Filesystem create date
+        # 13 => 'FileModifyDate',                # Filesystem modify date
+        # 14 => 'FileCreateDate',                # Filesystem create date
       },
       Groups    => { 2 => 'Time' },
       ValueConv => q{
@@ -38,7 +38,8 @@ require Time::Local;
           $val[1]  || $val[2]  || $val[3]  || $val[0]  ||  # top-tier
           $val[4]  || $val[5]  || $val[6]  || $val[7]  ||  # good fallbacks
           $val[8]  || $val[9]  || $val[10] || $val[11] ||  # format-specific
-          $val[12] || $val[13] || $val[14];                 # last resorts
+          $val[12];
+          # $val[13] || $val[14];                 # last resorts
 
         return undef unless defined $best;
 
