@@ -76,7 +76,7 @@ def _get_fs_btime(file: Path) -> Optional[datetime.datetime]:
     if btime is None:
         # Linux path: st_birthtime is not available, try statx.
         logger.debug("st_birthtime not available for %s, falling back to statx.", file)
-        btime = statx.statx(file).btime
+        btime = statx.statx(str(file)).btime
 
     if btime is None:
         logger.debug("statx returned no birth time for %s.", file)
