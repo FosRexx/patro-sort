@@ -121,7 +121,7 @@ def build_entries(files: list[Path], fs_ctime_fb: bool = False) -> Iterator[File
     )
 
     try:
-        with ExifToolHelper(config_file=EXIFTOOL_CONFIG) as et:
+        with ExifToolHelper(config_file=EXIFTOOL_CONFIG, check_execute=False) as et:
             for batch_index, batch in enumerate(_chunked(files), start=1):
                 logger.debug(
                     "Processing ExifTool batch %d (%d file(s)).",
