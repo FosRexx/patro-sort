@@ -25,11 +25,12 @@ class CalendarDateTime(ABC):
     filename generation.
     """
 
-    def __init__(self, utc: datetime.datetime) -> None:
+    def __init__(self, utc: datetime.datetime, fn_inc_year: bool = False) -> None:
         # Ensure the stored value is always UTC-aware.
         if utc.tzinfo is None:
             utc = utc.replace(tzinfo=datetime.timezone.utc)
         self._utc = utc
+        self._fn_inc_year = fn_inc_year
 
     @property
     def utc(self) -> datetime.datetime:
@@ -80,11 +81,12 @@ class CalendarDateTime(ABC):
         Colons within the time portion are replaced with hyphens for
         cross-platform filesystem compatibility.
         """
-        return (
-            f"{self.year:04d}-{self.month:02d}-{self.day:02d}"
-            f"T{self.hour:02d}-{self.minute:02d}-{self.second:02d}"
-            f"{self.utc_offset_str}"
-        )
+        filename = f"{self.day:02d}T{self.hour:02d}-{self.minute:02d}-{self.second:02d}{self.utc_offset_str}"
+
+        if self._fn_inc_year:
+            filename = f"{self.year:04d}-{self.month:02d}-" + filename
+
+        return filename
 
 
 class BikramSambatDateTime(CalendarDateTime):
@@ -97,8 +99,8 @@ class BikramSambatDateTime(CalendarDateTime):
     '+0545'.
     """
 
-    def __init__(self, utc: datetime.datetime) -> None:
-        super().__init__(utc)
+    def __init__(self, utc: datetime.datetime, fn_inc_year: bool = False) -> None:
+        super().__init__(utc, fn_inc_year)
         self._nst = self._utc.astimezone(
             datetime.timezone(datetime.timedelta(hours=5, minutes=45))
         )

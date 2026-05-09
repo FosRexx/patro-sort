@@ -12,6 +12,7 @@ class Args(argparse.Namespace):
     verbose: bool
     dry_run: bool
     fs_ctime_fb: bool  # filesystem creation-time fallback
+    fn_inc_year: bool  # filename include year
 
 
 def validate_args(args: Args, parser: argparse.ArgumentParser) -> None:
@@ -82,6 +83,12 @@ def parse_args() -> Args:
             "Fall back to the filesystem birth time when ExifTool cannot "
             "supply a creation date."
         ),
+    )
+    parser.add_argument(
+        "--fn-inc-year",
+        action="store_true",
+        dest="fn_inc_year",
+        help="Should the dest media filename include year",
     )
 
     args = parser.parse_args(namespace=Args())

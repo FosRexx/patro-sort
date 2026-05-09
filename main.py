@@ -99,7 +99,10 @@ def main() -> None:
         logger.warning("No files found in %s. Nothing to do.", args.src_dir)
         return
 
-    index = FileIndex(BikramSambatDateTime, args.src_dir)
+    def calendar_factory(utc):
+        return BikramSambatDateTime(utc, fn_inc_year=args.fn_inc_year)
+
+    index = FileIndex(calendar_factory, args.src_dir)
     logger.info("Extracting metadata...")
 
     for entry in build_entries(files, args.fs_ctime_fb):
