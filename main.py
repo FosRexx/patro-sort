@@ -84,6 +84,10 @@ def main() -> None:
         format="%(message)s",
     )
 
+    fh = logging.FileHandler(filename=args.log_file, mode="w")
+
+    logger.addHandler(fh)
+
     logger.info("patro-sort")
     logger.info("Source      : %s", args.src_dir)
     logger.info("Destination : %s", args.dest_dir)

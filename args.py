@@ -13,6 +13,7 @@ class Args(argparse.Namespace):
     dry_run: bool
     fs_ctime_fb: bool  # filesystem creation-time fallback
     fn_inc_year: bool  # filename include year
+    log_file: Path
 
 
 def validate_args(args: Args, parser: argparse.ArgumentParser) -> None:
@@ -89,6 +90,12 @@ def parse_args() -> Args:
         action="store_true",
         dest="fn_inc_year",
         help="Should the dest media filename include year",
+    )
+    parser.add_argument(
+        "--log-file",
+        type=Path,
+        default="/tmp/patro-sort.log",
+        help="Optional file path to write logs to. If not specified, logs print to the console.",
     )
 
     args = parser.parse_args(namespace=Args())
