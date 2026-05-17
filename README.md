@@ -57,7 +57,15 @@ and place it directly into your system's environment `PATH`.
 
 ---
 
-## Quick Start & Execution
+## Installation & Setup
+
+First, clone the project repository from GitHub and navigate into the project
+root directory:
+
+```bash
+git clone https://github.com/FosRexx/patro-sort.git
+cd patro-sort
+```
 
 `patro-sort` requires Python **3.14 or higher**. You can launch this software
 seamlessly using **`uv`** (recommended for speed and isolated environment
